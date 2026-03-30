@@ -1,24 +1,40 @@
 # Smart Assistive Stick System
 
-An end-to-end assistive safety platform that combines hardware sensing, a user mobile app, and a caregiver monitoring app. The goal is to improve safety, navigation support, and emergency response for visually impaired users.
+An end-to-end assistive safety platform that integrates embedded hardware, Android applications, and cloud services to support navigation and safety for visually impaired users.
 
-## Why This Project Matters
+---
 
-This project demonstrates practical engineering across embedded systems, Android development, real-time cloud sync, and UX for accessibility-focused use cases.
+## Overview
+
+This project combines:
+
+* Arduino-based hardware for environment sensing
+* A user Android application for real-time assistance
+* A caregiver Android application for remote monitoring
+* Firebase for real-time data synchronization
+
+The system enables obstacle detection, voice guidance, live location tracking, and emergency response.
+
+---
 
 ## System Architecture
 
-The system has three main layers:
+The system consists of three layers:
 
-1. Hardware Layer
-- Smart stick built with Arduino + sensors to detect environment and trigger events.
+### 1. Hardware Layer
 
-2. Mobile Apps Layer
-- SmartAssistiveStickApp: User-facing Android app for alerts, location, and assistance features.
-- Caregiver: Caregiver-facing Android app for live monitoring and emergency follow-up.
+A smart stick built using Arduino and sensors to detect obstacles and trigger events.
 
-3. Cloud Layer
-- Firebase Authentication + Realtime Database/Firestore for secure identity and real-time data sync.
+### 2. Mobile Applications
+
+* SmartAssistiveStickApp (user-side application)
+* Caregiver application (monitoring-side application)
+
+### 3. Cloud Layer
+
+* Firebase Realtime Database for real-time data exchange
+
+---
 
 ## Repository Structure
 
@@ -39,142 +55,250 @@ SmartAssistiveStick/
 `- README.md
 ```
 
-## Key Features
+---
 
-### SmartAssistiveStickApp (User App)
-- Bluetooth communication with stick hardware.
-- Voice and audio guidance flow.
-- Live location tracking with Google Maps.
-- SOS/emergency action support.
-- Firebase sync for status and location updates.
+## Features
 
-### Caregiver App
-- Live map view for user location.
-- Real-time status monitoring from Firebase.
-- Emergency alert visibility for quick response.
-- Simple interface for continuous supervision.
+### SmartAssistiveStickApp (User Application)
 
-## Hardware Setup (Arduino + Sensors)
+* Bluetooth communication with HC-05 module
+* Real-time voice alerts using Text-to-Speech
+* Indoor and outdoor navigation modes
+* Live location tracking using Google Maps
+* SOS emergency alert system
+* Background services for continuous operation
 
-This section is written as a clear template so recruiters can understand hardware integration quickly.
+---
 
-Typical components:
-- Arduino board (Uno/Nano or equivalent)
-- Ultrasonic sensor(s) for obstacle detection
-- Buzzer / vibration motor for alerts
-- Bluetooth module (for app communication)
-- Optional GPS module and power management module
+### Caregiver Application
 
-Example pin mapping (update as per your final wiring):
+* Real-time location tracking using Google Maps
+* Live monitoring of user status
+* SOS alert notifications
+* Secure connection using unique access key
 
-| Component | Pin Mapping (Example) |
-| --- | --- |
-| Ultrasonic TRIG | D9 |
-| Ultrasonic ECHO | D10 |
-| Buzzer | D6 |
-| Vibration Motor (via driver) | D5 |
-| Bluetooth TX/RX | D2 / D3 (SoftwareSerial) |
+---
 
-Note:
-- Keep this table aligned with your final Arduino sketch for demo consistency.
+## Hardware Setup
 
-## Full Working Flow
+### Ultrasonic Sensors
 
-1. Sensors detect obstacle, movement context, or trigger condition.
-2. Arduino processes input and sends event data over Bluetooth.
-3. SmartAssistiveStickApp receives event and updates UI/alerts.
-4. App pushes key status/location updates to Firebase.
-5. Caregiver app reads real-time data and shows alerts/location.
-6. Caregiver can react quickly in emergencies using live information.
+| Sensor | TRIG Pin | ECHO Pin |
+| ------ | -------- | -------- |
+| Front  | D9       | D8       |
+| Left   | D7       | D6       |
+| Right  | D5       | D4       |
 
-## Screenshots
+---
 
-Add screenshots here when available:
+### Other Components
 
-- User app home screen (SmartAssistiveStickApp)
-- User app map and alert screen
-- Caregiver live tracking screen
-- Caregiver emergency alert screen
+| Component           | Arduino Pin |
+| ------------------- | ----------- |
+| Mode Switch (3-pin) | D2          |
+| SOS Button          | D12         |
+| Buzzer              | D3          |
+| Bluetooth TX        | D10         |
+| Bluetooth RX        | D11         |
 
-Suggested structure:
+---
+
+### Power Connections
+
+* All sensors connected to 5V and GND
+* Bluetooth module connected to 3.3V and GND
+* Common ground shared across all components
+
+---
+
+## Hardware Logic
+
+### Distance Measurement
+
+Ultrasonic sensors measure distance using echo timing:
+
+distance = duration × 0.034 / 2
+
+---
+
+### Obstacle Detection Logic
+
+| Code | Description             |
+| ---- | ----------------------- |
+| F1   | Obstacle ahead          |
+| L1   | Obstacle on left        |
+| R1   | Obstacle on right       |
+| B1   | Obstacles on both sides |
+| FL   | Obstacle ahead-left     |
+| FR   | Obstacle ahead-right    |
+| FB   | Path blocked            |
+| SAFE | Path is clear           |
+
+---
+
+### Mode Handling
+
+* Controlled via 3-pin switch on D2
+* Indoor mode threshold: 20 cm ( we can change )
+* Outdoor mode threshold: 40 cm ( we can change )
+
+---
+
+### Stabilization and Control
+
+* Multiple readings required before confirming alert
+* Delay between sensor reads to avoid interference
+* Cooldown between alerts to prevent repetition
+
+---
+
+### SOS Functionality
+
+* SOS button connected to D12
+* Sends "SOS" signal via Bluetooth
+* Includes cooldown to avoid repeated triggers
+
+---
+
+### Bluetooth Communication
+
+* HC-05 module used
+* TX connected to D10
+* RX connected to D11
+
+Arduino sends short codes such as F1, L1, SAFE, MODE_INDOOR, SOS.
+
+---
+
+## User Application Logic
+
+1. Receives Bluetooth messages from Arduino
+2. Converts codes into readable alerts
+3. Provides voice output using Text-to-Speech
+4. Avoids repeating duplicate alerts
+5. Maintains priority handling:
+
+   * SOS (highest priority)
+   * Mode changes
+   * Normal alerts
+
+---
+
+### Location and Emergency Handling
+
+* Retrieves GPS location
+* Updates Firebase in real-time
+* Sends emergency alerts with location
+
+---
+
+## Caregiver Application Logic
+
+### Connection
+
+* Uses a unique access key to link with user
+
+---
+
+### Functionality
+
+* Displays real-time user location on map
+* Shows user status updates
+* Receives SOS alerts
+* Allows navigation to user location
+
+---
+
+## Firebase Backend
+
+### Data Structure
 
 ```text
-docs/screenshots/user-home.png
-docs/screenshots/user-map.png
-docs/screenshots/caregiver-tracking.png
-docs/screenshots/caregiver-alert.png
+users/
+  userId/
+    latitude
+    longitude
+    mode
+    sosActive
+    accessKey
+
+caregivers/
+  caregiverId/
+    linkedUserId
 ```
+
+---
+
+### Working
+
+* User application updates data
+* Caregiver application listens in real-time
+* Changes are reflected instantly
+
+---
+
+## Complete Working Flow
+
+1. Sensors detect obstacles
+2. Arduino processes input
+3. Sends message via Bluetooth
+4. User app receives and announces alert
+5. App updates Firebase
+6. Caregiver app receives updates
+7. SOS triggers emergency notification and location sharing
+
+---
 
 ## Setup Instructions
 
-### Prerequisites
-- Android Studio (latest stable)
-- Android SDK 34+
-- Firebase project
-- Google Maps Android API key
+### Requirements
 
-### 1) Clone
+* Android Studio
+* Firebase project
+* Google Maps API key
+
+---
+
+### Steps
+
+1. Clone the repository:
 
 ```bash
 git clone https://github.com/satish05112003/SmartAssistiveStick.git
-cd SmartAssistiveStick
 ```
 
-### 2) Add API key safely (do not commit)
-
-Create/update local properties in each app project:
-
-- SmartAssistiveStickApp/local.properties
-- Caregiver/local.properties
-
-Add:
+2. Add API key in local.properties:
 
 ```properties
 MAPS_API_KEY=YOUR_API_KEY
 ```
 
-The manifest already reads:
+3. Add Firebase configuration:
+   Place google-services.json inside each app module.
 
-```xml
-android:value="${MAPS_API_KEY}"
-```
+4. Build and run both applications.
 
-### 3) Add Firebase config files (do not commit)
+---
 
-Place `google-services.json` in:
+## Security Practices
 
-- SmartAssistiveStickApp/app/google-services.json
-- Caregiver/app/google-services.json
+* API keys are not stored in source code
+* local.properties is excluded from version control
+* google-services.json is excluded from version control
+* Build files and IDE files are ignored
 
-### 4) Build and run
-
-Build each app from its own folder in Android Studio, or run Gradle from each project directory.
-
-## Tech Stack
-
-- Kotlin
-- Jetpack Compose
-- Android SDK / Google Play Services (Maps, Location)
-- Firebase Authentication
-- Firebase Realtime Database / Firestore
-- Gradle Kotlin DSL
-- Arduino (embedded controller)
-
-## Security Practices Used
-
-- No hardcoded API keys in source.
-- `local.properties` excluded from version control.
-- `google-services.json` excluded from version control.
-- Build outputs and IDE files ignored via `.gitignore`.
+---
 
 ## Future Improvements
 
-- Add offline-first sync strategy for unstable connectivity.
-- Add unit and instrumentation test coverage reports.
-- Add CI pipeline for build + lint + security checks.
-- Improve multilingual voice guidance.
-- Add wearable integration for quicker caregiver notifications.
+* Advanced obstacle detection using AI
+* Voice-based navigation with destination input
+* Multi-language voice support
+* Wearable integration
+* Offline functionality
 
-## Recruiter Note
+---
 
-This project highlights cross-domain capability: embedded hardware integration, mobile app engineering, cloud backend integration, and real-time safety workflows for a meaningful real-world use case.
+## Summary
+
+This project is a complete assistive system where embedded hardware, mobile applications, and cloud services work together to provide real-time navigation assistance and emergency support for visually impaired users.
