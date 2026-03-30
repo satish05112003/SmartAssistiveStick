@@ -1,139 +1,180 @@
-# Smart Assistive Stick
+# Smart Assistive Stick System
 
-A smart Bluetooth-enabled assistive device that combines location tracking, voice commands, emergency SMS alerts, and real-time monitoring for enhanced personal assistance.
+An end-to-end assistive safety platform that combines hardware sensing, a user mobile app, and a caregiver monitoring app. The goal is to improve safety, navigation support, and emergency response for visually impaired users.
 
-## Features
+## Why This Project Matters
 
-- **Bluetooth Connectivity**: Seamless pairing with external Bluetooth devices
-- **Location Tracking**: Real-time GPS location tracking and sharing
-- **Voice Commands**: Hands-free voice interaction support
-- **Emergency Alerts**: Quick SMS alerts to configured contacts
-- **Google Maps Integration**: Interactive map view for location monitoring
-- **Firebase Integration**: Real-time database for data synchronization
-- **Jetpack Compose UI**: Modern Android UI framework
+This project demonstrates practical engineering across embedded systems, Android development, real-time cloud sync, and UX for accessibility-focused use cases.
 
-## Technology Stack
+## System Architecture
 
-- **Language**: Kotlin
-- **UI Framework**: Jetpack Compose
-- **Minimum SDK**: 26 (Android 8.0)
-- **Target SDK**: 34 (Android 14)
-- **Architecture**: MVVM with Jetpack components
-- **Database**: Room, Firebase Realtime Database
-- **Authentication**: Firebase Authentication
-- **Location Services**: Google Play Services
-- **Build System**: Gradle (Kotlin DSL)
+The system has three main layers:
 
-## Project Structure
+1. Hardware Layer
+- Smart stick built with Arduino + sensors to detect environment and trigger events.
 
-```
+2. Mobile Apps Layer
+- SmartAssistiveStickApp: User-facing Android app for alerts, location, and assistance features.
+- Caregiver: Caregiver-facing Android app for live monitoring and emergency follow-up.
+
+3. Cloud Layer
+- Firebase Authentication + Realtime Database/Firestore for secure identity and real-time data sync.
+
+## Repository Structure
+
+```text
 SmartAssistiveStick/
-├── app/
-│   ├── src/
-│   │   └── main/
-│   │       ├── java/com/example/smartassistivestick/
-│   │       ├── res/
-│   │       └── AndroidManifest.xml
-│   ├── build.gradle.kts
-│   └── google-services.json (add manually)
-├── build.gradle.kts
-├── local.properties
-├── settings.gradle.kts
-└── .gitignore
+|- SmartAssistiveStickApp/
+|  |- app/
+|  |- gradle/
+|  |- build.gradle.kts
+|  |- settings.gradle.kts
+|  `- gradle.properties
+|- Caregiver/
+|  |- app/
+|  |- gradle/
+|  |- build.gradle.kts
+|  |- settings.gradle.kts
+|  `- gradle.properties
+`- README.md
+```
+
+## Key Features
+
+### SmartAssistiveStickApp (User App)
+- Bluetooth communication with stick hardware.
+- Voice and audio guidance flow.
+- Live location tracking with Google Maps.
+- SOS/emergency action support.
+- Firebase sync for status and location updates.
+
+### Caregiver App
+- Live map view for user location.
+- Real-time status monitoring from Firebase.
+- Emergency alert visibility for quick response.
+- Simple interface for continuous supervision.
+
+## Hardware Setup (Arduino + Sensors)
+
+This section is written as a clear template so recruiters can understand hardware integration quickly.
+
+Typical components:
+- Arduino board (Uno/Nano or equivalent)
+- Ultrasonic sensor(s) for obstacle detection
+- Buzzer / vibration motor for alerts
+- Bluetooth module (for app communication)
+- Optional GPS module and power management module
+
+Example pin mapping (update as per your final wiring):
+
+| Component | Pin Mapping (Example) |
+| --- | --- |
+| Ultrasonic TRIG | D9 |
+| Ultrasonic ECHO | D10 |
+| Buzzer | D6 |
+| Vibration Motor (via driver) | D5 |
+| Bluetooth TX/RX | D2 / D3 (SoftwareSerial) |
+
+Note:
+- Keep this table aligned with your final Arduino sketch for demo consistency.
+
+## Full Working Flow
+
+1. Sensors detect obstacle, movement context, or trigger condition.
+2. Arduino processes input and sends event data over Bluetooth.
+3. SmartAssistiveStickApp receives event and updates UI/alerts.
+4. App pushes key status/location updates to Firebase.
+5. Caregiver app reads real-time data and shows alerts/location.
+6. Caregiver can react quickly in emergencies using live information.
+
+## Screenshots
+
+Add screenshots here when available:
+
+- User app home screen (SmartAssistiveStickApp)
+- User app map and alert screen
+- Caregiver live tracking screen
+- Caregiver emergency alert screen
+
+Suggested structure:
+
+```text
+docs/screenshots/user-home.png
+docs/screenshots/user-map.png
+docs/screenshots/caregiver-tracking.png
+docs/screenshots/caregiver-alert.png
 ```
 
 ## Setup Instructions
 
 ### Prerequisites
+- Android Studio (latest stable)
+- Android SDK 34+
+- Firebase project
+- Google Maps Android API key
 
-- Android SDK 34 or higher
-- Gradle 8.1 or higher
-- Google account for Firebase
-- Google Maps API key
-
-### 1. Clone the Repository
+### 1) Clone
 
 ```bash
 git clone https://github.com/satish05112003/SmartAssistiveStick.git
 cd SmartAssistiveStick
 ```
 
-### 2. Add Google Maps API Key
+### 2) Add API key safely (do not commit)
 
-Edit `local.properties` and add your API key:
+Create/update local properties in each app project:
+
+- SmartAssistiveStickApp/local.properties
+- Caregiver/local.properties
+
+Add:
 
 ```properties
-sdk.dir=/path/to/android/sdk
-MAPS_API_KEY=YOUR_GOOGLE_MAPS_API_KEY_HERE
+MAPS_API_KEY=YOUR_API_KEY
 ```
 
-### 3. Add Firebase Configuration
+The manifest already reads:
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project or use existing one
-3. Download `google-services.json`
-4. Place it at `app/google-services.json`:
-
-```bash
-cp /path/to/google-services.json app/
+```xml
+android:value="${MAPS_API_KEY}"
 ```
 
-### 4. Build and Run
+### 3) Add Firebase config files (do not commit)
 
-```bash
-# Build the project
-./gradlew build
+Place `google-services.json` in:
 
-# Run on emulator or device
-./gradlew installDebug
-```
+- SmartAssistiveStickApp/app/google-services.json
+- Caregiver/app/google-services.json
 
-## Obtaining API Keys
+### 4) Build and run
 
-### Google Maps API Key
+Build each app from its own folder in Android Studio, or run Gradle from each project directory.
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project
-3. Enable Google Maps Android API
-4. Create an Android API key with your app's SHA-1 fingerprint
-5. Add the key to `local.properties`
+## Tech Stack
 
-### Firebase Setup
+- Kotlin
+- Jetpack Compose
+- Android SDK / Google Play Services (Maps, Location)
+- Firebase Authentication
+- Firebase Realtime Database / Firestore
+- Gradle Kotlin DSL
+- Arduino (embedded controller)
 
-1. Visit [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project
-3. Add Android app to the project
-4. Download and place `google-services.json`
-5. Enable required services (Authentication, Realtime Database, Firestore)
+## Security Practices Used
 
-## Security Notes
+- No hardcoded API keys in source.
+- `local.properties` excluded from version control.
+- `google-services.json` excluded from version control.
+- Build outputs and IDE files ignored via `.gitignore`.
 
-⚠️ **Important**: 
-- Never commit API keys or secrets to version control
-- `google-services.json` is in `.gitignore` for security
-- `local.properties` contains sensitive data and is not committed
-- Always use environment-specific configurations
+## Future Improvements
 
-## Building for Release
+- Add offline-first sync strategy for unstable connectivity.
+- Add unit and instrumentation test coverage reports.
+- Add CI pipeline for build + lint + security checks.
+- Improve multilingual voice guidance.
+- Add wearable integration for quicker caregiver notifications.
 
-```bash
-# Create release build
-./gradlew assembleRelease
+## Recruiter Note
 
-# Find APK at: app/build/outputs/apk/release/app-release.apk
-```
-
-## Contributing
-
-1. Create a feature branch: `git checkout -b feature/your-feature`
-2. Commit changes: `git commit -am 'Add new feature'`
-3. Push to branch: `git push origin feature/your-feature`
-4. Submit a pull request
-
-## License
-
-This project is proprietary and confidential. All rights reserved.
-
-## Support
-
-For issues and questions, please open an issue on GitHub.
+This project highlights cross-domain capability: embedded hardware integration, mobile app engineering, cloud backend integration, and real-time safety workflows for a meaningful real-world use case.
