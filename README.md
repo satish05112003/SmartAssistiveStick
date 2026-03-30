@@ -134,10 +134,6 @@ cp /path/to/google-services.json app/
 
 This project is proprietary and confidential. All rights reserved.
 
-## Author
-
-Satish Kumar
-
 ## Support
 
 For issues and questions, please open an issue on GitHub.
