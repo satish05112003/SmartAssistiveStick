@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.Caregiver" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary color -->
+        <item name="colorPrimary">#00FF9C</item>
+        <item name="colorOnPrimary">#000000</item>
+
+        <!-- Background -->
+        <item name="android:colorBackground">#000000</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">#000000</item>
+
+        <!-- Navigation bar -->
+        <item name="android:navigationBarColor">#000000</item>
+    </style>
+</resources>

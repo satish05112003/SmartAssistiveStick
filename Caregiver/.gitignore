@@ -1,0 +1,28 @@
+# Build files
+build/
+.gradle/
+local.properties
+
+# APK / outputs
+*.apk
+*.aab
+*.zip
+
+# Firebase secrets
+google-services.json
+
+# IDE files
+.idea/
+*.iml
+.DS_Store
+*.swp
+*.swo
+
+# Gradle wrapper
+gradle-wrapper.jar
+
+# Java
+*.class
+
+# Profiling
+*.hprof
